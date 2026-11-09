@@ -52,7 +52,7 @@ The stack is fixed by the Master Project Prompt. One item (Spring Boot version) 
 | Map rendering | `flutter_svg` for the floor plan, `CustomPainter` for route, markers and blocked overlays, inside one pan/zoom container | Per the prompt; avoids a map SDK or GIS stack |
 | Local settings | SharedPreferences | Only simple device-level preferences (PRD FR-36). SQLite/Drift not needed |
 | Backend language | Java 21 LTS | Mandated; records, modern collections, long-term support |
-| Backend framework | Spring Boot (version per AD-1), Spring Web, Spring Data JPA, Spring Validation, Spring Security (admin endpoints only) | Mandated; mature, well documented, suits layered architecture |
+| Backend framework | Spring Boot (version per AD-1), Spring Web, Spring Data JPA, Spring Validation, Spring Security (admin endpoints only) with its OAuth2 resource-server support for signing and verifying tokens | Mandated; mature, well documented, suits layered architecture |
 | API docs | springdoc OpenAPI / Swagger UI (release line matching the Boot version) | Generated contract that the mobile developer reads |
 | Build | Maven multi-module | Backend depends on engine without circular dependencies |
 | Database | PostgreSQL (current stable major, AA-2) | Relational integrity, constraints, indexes; mandated |
