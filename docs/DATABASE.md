@@ -491,6 +491,7 @@ There is no per-user ownership and no multi-tenancy in the MVP: all buildings ar
 | V3 | Table `obstacles` with constraints and indexes |
 | V4 | Reference data every environment needs: the connection type rows (CORRIDOR, DOORWAY, RAMP, STAIRS, ELEVATOR) with default speeds and fixed times (DBA-5) |
 | V5 | Database roles and grants for hosted environments, guarded so it is a no-op in local development (DBD-3) |
+| V6 | Tune the stairs and elevator reference timings so the required shortest-versus-fastest sample scenario is demonstrable |
 
 Connection types are reference data, not demo data, so they are in a versioned migration and always present.
 
