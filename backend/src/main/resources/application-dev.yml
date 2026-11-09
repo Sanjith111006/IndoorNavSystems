@@ -1,0 +1,20 @@
+# Local development defaults only. Hosted environments use the prod profile, which has none.
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/indoornav}
+    username: ${DB_USER:indoornav}
+    password: ${DB_PASSWORD:local-dev-password}
+  flyway:
+    user: ${MIGRATION_DB_USER:${DB_USER:indoornav}}
+    password: ${MIGRATION_DB_PASSWORD:${DB_PASSWORD:local-dev-password}}
+
+springdoc:
+  api-docs:
+    enabled: ${SWAGGER_ENABLED:true}
+  swagger-ui:
+    enabled: ${SWAGGER_ENABLED:true}
+
+app:
+  seed-demo-data: ${SEED_DEMO_DATA:true}
+  admin:
+    username: ${ADMIN_USERNAME:admin}

@@ -1,0 +1,63 @@
+spring:
+  application:
+    name: indoor-navigation-backend
+  profiles:
+    default: dev
+  datasource:
+    url: ${DB_URL:}
+    username: ${DB_USER:}
+    password: ${DB_PASSWORD:}
+    hikari:
+      connection-timeout: 3000
+  flyway:
+    user: ${MIGRATION_DB_USER:${DB_USER:}}
+    password: ${MIGRATION_DB_PASSWORD:${DB_PASSWORD:}}
+    locations: classpath:db/migration
+    # A database seeded earlier must still start with seeding disabled (DATABASE.md 11.3).
+    ignore-migration-patterns: "*:missing"
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate.jdbc.time_zone: UTC
+  servlet:
+    multipart:
+      enabled: false
+
+server:
+  port: ${SERVER_PORT:8080}
+  compression:
+    enabled: true
+    mime-types: application/json
+  error:
+    include-message: never
+    include-stacktrace: never
+    include-binding-errors: never
+    whitelabel:
+      enabled: false
+
+springdoc:
+  api-docs:
+    enabled: ${SWAGGER_ENABLED:false}
+  swagger-ui:
+    enabled: ${SWAGGER_ENABLED:false}
+
+logging:
+  pattern:
+    level: "%5p [%X{requestId:-}]"
+
+app:
+  seed-demo-data: ${SEED_DEMO_DATA:false}
+  admin:
+    username: ${ADMIN_USERNAME:}
+    password-hash: ${ADMIN_PASSWORD_HASH:}
+  jwt:
+    secret: ${JWT_SECRET:}
+    ttl-minutes: ${JWT_TTL_MINUTES:60}
+  login:
+    max-failed-attempts: ${LOGIN_MAX_FAILED_ATTEMPTS:5}
+    attempt-window-minutes: ${LOGIN_ATTEMPT_WINDOW_MINUTES:15}
+    trust-forwarded-headers: ${TRUST_FORWARDED_HEADERS:false}
+  floor-plans:
+    directory: ${FLOORPLAN_DIR:}
