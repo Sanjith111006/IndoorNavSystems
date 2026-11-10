@@ -1,12 +1,13 @@
 package com.indoornav.engine.cost;
 
 import com.indoornav.engine.model.ConnectionType;
+import com.indoornav.engine.model.NavigationEdge;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 /**
- * Immutable caller-provided routing costs and positive stairs surcharges.
+ * Immutable caller-provided routing costs and positive stairs surcharges. An edge time override takes precedence.
  */
 public record RoutingCostConfiguration(
         Map<ConnectionType, ConnectionCost> connectionCosts,
@@ -29,12 +30,16 @@ public record RoutingCostConfiguration(
         }
     }
 
-    public double travelTimeSeconds(double distanceMetres, ConnectionType connectionType) {
-        ConnectionCost cost = connectionCosts.get(connectionType);
-        if (cost == null) {
-            throw new IllegalArgumentException("No cost exists for connection type " + connectionType.code() + ".");
+    public double travelTimeSeconds(NavigationEdge edge) {
+        Objects.requireNonNull(edge, "edge must not be null");
+        if (edge.timeSeconds() != null) {
+            return edge.timeSeconds();
         }
-        return (distanceMetres / cost.speedMetresPerSecond()) + cost.fixedTimeSeconds();
+        ConnectionCost cost = connectionCosts.get(edge.connectionType());
+        if (cost == null) {
+            throw new IllegalArgumentException("No cost exists for connection type " + edge.connectionType().code() + ".");
+        }
+        return (edge.distanceMetres() / cost.speedMetresPerSecond()) + cost.fixedTimeSeconds();
     }
 
     public double fastestHorizontalSpeedMetresPerSecond() {

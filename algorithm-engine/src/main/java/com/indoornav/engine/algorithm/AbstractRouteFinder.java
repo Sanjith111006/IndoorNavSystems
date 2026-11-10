@@ -50,7 +50,7 @@ abstract class AbstractRouteFinder implements RouteFinder {
         if (preference == RoutePreference.SHORTEST) {
             return edge.distanceMetres();
         }
-        double baseTime = configuration.travelTimeSeconds(edge.distanceMetres(), edge.connectionType());
+        double baseTime = configuration.travelTimeSeconds(edge);
         if (!edge.connectionType().isStairs()) {
             return baseTime;
         }
@@ -100,7 +100,7 @@ abstract class AbstractRouteFinder implements RouteFinder {
         for (int edgeIndex = 0; edgeIndex < edgeIds.size(); edgeIndex++) {
             NavigationEdge edge = graph.edge(edgeIds.get(edgeIndex));
             totalDistance += edge.distanceMetres();
-            totalTime += configuration.travelTimeSeconds(edge.distanceMetres(), edge.connectionType());
+            totalTime += configuration.travelTimeSeconds(edge);
             usesStairs |= edge.connectionType().isStairs();
             NavigationNode from = graph.node(nodeIds.get(edgeIndex));
             NavigationNode to = graph.node(nodeIds.get(edgeIndex + 1));

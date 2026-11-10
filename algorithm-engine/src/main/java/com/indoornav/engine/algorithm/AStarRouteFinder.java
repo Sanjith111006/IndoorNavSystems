@@ -26,8 +26,12 @@ public final class AStarRouteFinder extends AbstractRouteFinder {
         Map<Long, Double> costs = new HashMap<>();
         Map<Long, PreviousStep> previousSteps = new HashMap<>();
         PriorityQueue<QueueEntry> queue = new PriorityQueue<>(Comparator.comparingDouble(QueueEntry::estimatedTotalCost));
+        boolean canUseTimeHeuristic = !hasFasterThanGeometricTimeOverride(graph, costConfiguration);
         costs.put(request.startNodeId(), 0.0);
-        queue.add(new QueueEntry(request.startNodeId(), 0.0, heuristic(graph, request, costConfiguration, request.startNodeId())));
+        queue.add(new QueueEntry(
+                request.startNodeId(),
+                0.0,
+                heuristic(graph, request, costConfiguration, request.startNodeId(), canUseTimeHeuristic)));
 
         while (!queue.isEmpty()) {
             QueueEntry current = queue.remove();
@@ -37,7 +41,7 @@ public final class AStarRouteFinder extends AbstractRouteFinder {
             if (current.nodeId() == request.destinationNodeId()) {
                 break;
             }
-            relaxTraversals(graph, request, costConfiguration, current, costs, previousSteps, queue);
+            relaxTraversals(graph, request, costConfiguration, current, costs, previousSteps, queue, canUseTimeHeuristic);
         }
         return createResult(graph, request, costConfiguration, previousSteps);
     }
@@ -53,7 +57,8 @@ public final class AStarRouteFinder extends AbstractRouteFinder {
             QueueEntry current,
             Map<Long, Double> costs,
             Map<Long, PreviousStep> previousSteps,
-            PriorityQueue<QueueEntry> queue) {
+            PriorityQueue<QueueEntry> queue,
+            boolean canUseTimeHeuristic) {
         for (NavigationGraph.Traversal traversal : graph.traversalsFrom(current.nodeId())) {
             if (!isAvailable(graph, request, current.nodeId(), traversal)) {
                 continue;
@@ -63,7 +68,8 @@ public final class AStarRouteFinder extends AbstractRouteFinder {
             if (isBetter(candidateCost, knownCost)) {
                 costs.put(traversal.destinationNodeId(), candidateCost);
                 previousSteps.put(traversal.destinationNodeId(), new PreviousStep(current.nodeId(), traversal.edge()));
-                double estimate = candidateCost + heuristic(graph, request, configuration, traversal.destinationNodeId());
+                double estimate = candidateCost
+                        + heuristic(graph, request, configuration, traversal.destinationNodeId(), canUseTimeHeuristic);
                 queue.add(new QueueEntry(traversal.destinationNodeId(), candidateCost, estimate));
             }
         }
@@ -73,7 +79,8 @@ public final class AStarRouteFinder extends AbstractRouteFinder {
             NavigationGraph graph,
             RouteRequest request,
             RoutingCostConfiguration configuration,
-            long nodeId) {
+            long nodeId,
+            boolean canUseTimeHeuristic) {
         NavigationNode node = graph.node(nodeId);
         NavigationNode destination = graph.node(request.destinationNodeId());
         double nodeScale = graph.metresPerUnit(node.floorId());
@@ -84,7 +91,23 @@ public final class AStarRouteFinder extends AbstractRouteFinder {
         if (request.preference() == RoutePreference.SHORTEST) {
             return horizontalDistance;
         }
+        if (!canUseTimeHeuristic) {
+            return 0.0;
+        }
         return horizontalDistance / configuration.fastestHorizontalSpeedMetresPerSecond();
+    }
+
+    private boolean hasFasterThanGeometricTimeOverride(
+            NavigationGraph graph,
+            RoutingCostConfiguration configuration) {
+        for (long edgeId : graph.edgeIds()) {
+            NavigationEdge edge = graph.edge(edgeId);
+            if (edge.timeSeconds() != null
+                    && edge.timeSeconds() < edge.distanceMetres() / configuration.fastestHorizontalSpeedMetresPerSecond()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private record QueueEntry(long nodeId, double cost, double estimatedTotalCost) {

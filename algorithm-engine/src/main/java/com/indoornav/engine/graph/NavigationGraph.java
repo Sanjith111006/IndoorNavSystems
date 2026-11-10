@@ -38,6 +38,10 @@ public final class NavigationGraph {
         return edgesById.get(edgeId);
     }
 
+    public List<Long> edgeIds() {
+        return List.copyOf(edgesById.keySet());
+    }
+
     public List<Traversal> traversalsFrom(long nodeId) {
         return traversalsByNodeId.getOrDefault(nodeId, List.of());
     }

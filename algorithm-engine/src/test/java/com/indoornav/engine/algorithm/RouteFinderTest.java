@@ -102,6 +102,23 @@ class RouteFinderTest {
     }
 
     @Test
+    void explicitEdgeTimeOverridesDerivedTimeForFastestRoutesAndMetrics() {
+        NavigationGraph graph = graph(
+                List.of(node(1, 1, 0, 0, true), node(2, 1, 4, 0, true), node(3, 1, 0, 3, true)),
+                List.of(edge(1, 1, 2, 4, ConnectionType.CORRIDOR, true, true),
+                        edge(2, 1, 3, 3, ConnectionType.CORRIDOR, true, true),
+                        edgeWithTime(3, 3, 2, 5, 0.5, ConnectionType.CORRIDOR, true, true)));
+
+        RouteResult result = aStar.findRoute(graph, RouteRequest.of(1, 2, RoutePreference.FASTEST), costs());
+        RouteResult dijkstraResult = dijkstra.findRoute(graph, RouteRequest.of(1, 2, RoutePreference.FASTEST), costs());
+
+        assertEquals(List.of(2L, 3L), result.edgeIds());
+        assertEquals(8.0, result.totalDistanceMetres(), TOLERANCE);
+        assertEquals(3.5, result.totalEstimatedTimeSeconds(), TOLERANCE);
+        assertEquals(dijkstraResult.totalEstimatedTimeSeconds(), result.totalEstimatedTimeSeconds(), TOLERANCE);
+    }
+
+    @Test
     void accessibleRoutesExcludeInaccessibleConnectionsAndNodes() {
         NavigationGraph graph = graph(
                 List.of(node(1, 1, 0, 0, true), node(2, 1, 1, 0, false), node(3, 1, 0, 2, true), node(4, 1, 2, 0, true)),
@@ -216,7 +233,19 @@ class RouteFinderTest {
 
     private NavigationEdge edge(
             long id, long from, long to, double distance, ConnectionType type, boolean accessible, boolean bidirectional) {
-        return new NavigationEdge(id, from, to, distance, type, accessible, bidirectional);
+        return edgeWithTime(id, from, to, distance, null, type, accessible, bidirectional);
+    }
+
+    private NavigationEdge edgeWithTime(
+            long id,
+            long from,
+            long to,
+            double distance,
+            Double timeSeconds,
+            ConnectionType type,
+            boolean accessible,
+            boolean bidirectional) {
+        return new NavigationEdge(id, from, to, distance, timeSeconds, type, accessible, bidirectional);
     }
 
     private RoutingCostConfiguration costs() {
