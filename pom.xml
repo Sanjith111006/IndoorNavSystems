@@ -19,7 +19,7 @@
     <name>Indoor Navigation Parent</name>
 
     <modules>
-        <!-- algorithm-engine (Person 3) is added here when that module exists. -->
+        <module>algorithm-engine</module>
         <module>backend</module>
     </modules>
 
