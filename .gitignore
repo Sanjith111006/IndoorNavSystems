@@ -4,6 +4,10 @@
 # Maven build output
 target/
 
+# Flutter build output
+mobile-app/.dart_tool/
+mobile-app/build/
+
 # IDE and OS files
 .idea/
 *.iml
