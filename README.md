@@ -6,6 +6,20 @@ Indoor navigation and path optimization platform. See `docs/` for the product, a
 
 Requires Java 21, Maven 3.9 or later, and Docker for the PostgreSQL-backed persistence tests.
 
+### Local containers
+
+Copy `.env.example` to `.env` and replace at least `POSTGRES_PASSWORD`. Then start the complete
+local environment:
+
+```bash
+docker compose up --build
+```
+
+This starts PostgreSQL with a named volume and waits for it to become healthy before starting the
+backend. Flyway applies the migrations and loads the demo seed data; Swagger UI is available at
+`http://localhost:8080/swagger-ui.html`. The database is intentionally not published to the host.
+Use `docker compose down` to stop the environment without deleting its database volume.
+
 Run the tests from the repository root:
 
 ```bash
@@ -15,6 +29,9 @@ mvn test
 `DatabaseIntegrityTest` starts a clean PostgreSQL 17 container, applies Flyway migrations and
 the repeatable demo seeds, then validates the schema and data constraints. Docker must be
 running for that test; the remaining unit and web tests do not require a database.
+
+GitHub Actions runs the same backend and engine test suite for changes to their source,
+database assets or governing contracts.
 
 To start the backend you need PostgreSQL and the migrations in `database/migrations`. Copy `.env.example` to `.env`, fill in the values and export them into your shell, then run:
 

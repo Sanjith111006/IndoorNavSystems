@@ -1,0 +1,44 @@
+name: Backend
+
+on:
+  pull_request:
+    paths:
+      - "algorithm-engine/**"
+      - "backend/**"
+      - "database/**"
+      - "pom.xml"
+      - ".github/workflows/backend.yml"
+      - "docs/AGENTS.md"
+      - "docs/ARCHITECTURE.md"
+      - "docs/DATABASE.md"
+      - "docs/API.md"
+  push:
+    branches: [main]
+    paths:
+      - "algorithm-engine/**"
+      - "backend/**"
+      - "database/**"
+      - "pom.xml"
+      - ".github/workflows/backend.yml"
+      - "docs/AGENTS.md"
+      - "docs/ARCHITECTURE.md"
+      - "docs/DATABASE.md"
+      - "docs/API.md"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v5
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - name: Run backend and engine tests
+        run: mvn --batch-mode --no-transfer-progress test
