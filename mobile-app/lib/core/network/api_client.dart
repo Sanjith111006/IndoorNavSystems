@@ -45,6 +45,33 @@ class ApiClient {
     }
   }
 
+  Future<Map<String, Object?>> getObject(String path) async {
+    try {
+      final response = await _dio.get<Object?>(path);
+      return _asObjectMap(response.data);
+    } on DioException catch (error) {
+      throw _failureFor(error);
+    } on FormatException {
+      throw const InvalidResponseFailure();
+    }
+  }
+
+  Future<String> getText(String path) async {
+    try {
+      final response = await _dio.get<String>(
+        path,
+        options: Options(responseType: ResponseType.plain),
+      );
+      final content = response.data;
+      if (content == null || content.isEmpty) {
+        throw const InvalidResponseFailure();
+      }
+      return content;
+    } on DioException catch (error) {
+      throw _failureFor(error);
+    }
+  }
+
   Map<String, Object?> _asObjectMap(Object? value) {
     if (value is! Map<Object?, Object?>) {
       throw const FormatException('Expected an object.');

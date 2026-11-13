@@ -53,3 +53,29 @@ class Building {
     return value;
   }
 }
+
+class BuildingDetail extends Building {
+  const BuildingDetail({
+    required super.id,
+    required super.name,
+    required super.description,
+    required super.buildingType,
+    required super.address,
+    required super.floorCount,
+    required this.defaultFloorId,
+  });
+
+  factory BuildingDetail.fromJson(Map<String, Object?> json) {
+    return BuildingDetail(
+      id: Building._requiredInt(json, 'id'),
+      name: Building._requiredString(json, 'name'),
+      description: Building._optionalString(json, 'description'),
+      buildingType: Building._requiredString(json, 'buildingType'),
+      address: Building._optionalString(json, 'address'),
+      floorCount: Building._requiredInt(json, 'floorCount'),
+      defaultFloorId: Building._requiredInt(json, 'defaultFloorId'),
+    );
+  }
+
+  final int defaultFloorId;
+}
