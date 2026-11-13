@@ -1,0 +1,7 @@
+.git
+.env
+.idea
+.vscode
+**/target
+mobile-app/.dart_tool
+mobile-app/build

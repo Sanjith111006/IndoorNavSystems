@@ -612,9 +612,16 @@ The API base URL is supplied at build or run time (compile-time define), with no
 - Path filters run only the relevant workflow when only one domain changed; changes to `docs/` or the API contract trigger both.
 - Branch protection on main: required checks, required review, no direct pushes.
 
+The implemented backend workflow is `.github/workflows/backend.yml`. Its path filters include
+the backend, engine, database assets, Maven parent and documents that govern those contracts.
+
 ### 17.2 Local run
 
 One command starts the database and backend; Flyway migrates on startup; the demo seed loads in dev. The compose file defines two services: database (with a named volume and a health check) and backend (starts after the database is healthy). Only the backend port is published in non-development profiles.
+
+The implementation is root `docker-compose.yml` with `backend/Dockerfile`. Compose reads local-only
+values from `.env`; `POSTGRES_PASSWORD` is required and no database port is published. The backend
+image builds the full Maven reactor and runs as an unprivileged `app` user.
 
 ### 17.3 Build artefacts
 
