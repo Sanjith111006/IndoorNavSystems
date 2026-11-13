@@ -69,7 +69,10 @@ class _FakeApiClient extends ApiClient {
   final List<Map<String, Object?>> _response;
 
   @override
-  Future<List<Map<String, Object?>>> getObjectList(String path) async {
+  Future<List<Map<String, Object?>>> getObjectList(
+    String path, {
+    Map<String, Object?>? queryParameters,
+  }) async {
     return _response;
   }
 }

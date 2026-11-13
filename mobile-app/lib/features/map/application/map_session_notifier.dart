@@ -6,6 +6,8 @@ import '../../buildings/data/building_repository.dart';
 import '../../buildings/domain/building.dart';
 import '../../floors/data/floor_repository.dart';
 import '../../floors/domain/floor.dart';
+import '../../search/domain/destination.dart';
+import '../../search/domain/start_location.dart';
 import '../data/floor_map_repository.dart';
 import '../domain/floor_map.dart';
 
@@ -54,14 +56,50 @@ class MapSessionNotifier extends Notifier<MapSessionState> {
     if (floor == null) {
       return;
     }
-    await _loadFloor(current.building, current.floors, floor);
+    await _loadFloor(
+      current.building,
+      current.floors,
+      floor,
+      destination: current.destination,
+      start: current.start,
+    );
+  }
+
+  void setDestination(Destination destination) {
+    final current = state;
+    if (current is! MapSessionReady) {
+      return;
+    }
+    state = MapSessionReady(
+      building: current.building,
+      floors: current.floors,
+      floorMap: current.floorMap,
+      destination: destination,
+      start: current.start,
+    );
+  }
+
+  void setStart(StartLocation start) {
+    final current = state;
+    if (current is! MapSessionReady) {
+      return;
+    }
+    state = MapSessionReady(
+      building: current.building,
+      floors: current.floors,
+      floorMap: current.floorMap,
+      destination: current.destination,
+      start: start,
+    );
   }
 
   Future<void> _loadFloor(
     BuildingDetail building,
     List<Floor> floors,
-    Floor floor,
-  ) async {
+    Floor floor, {
+    Destination? destination,
+    StartLocation? start,
+  }) async {
     state = const MapSessionLoading();
     final mapResult = await ref
         .read(floorMapRepositoryProvider)
@@ -71,6 +109,8 @@ class MapSessionNotifier extends Notifier<MapSessionState> {
         building: building,
         floors: floors,
         floorMap: floorMap,
+        destination: destination,
+        start: start,
       ),
       Failure<FloorMap>(error: final error) => MapSessionFailure(
         _asFailure(error),
@@ -105,11 +145,15 @@ class MapSessionReady extends MapSessionState {
     required this.building,
     required this.floors,
     required this.floorMap,
+    this.destination,
+    this.start,
   });
 
   final BuildingDetail building;
   final List<Floor> floors;
   final FloorMap floorMap;
+  final Destination? destination;
+  final StartLocation? start;
 }
 
 class MapSessionFailure extends MapSessionState {

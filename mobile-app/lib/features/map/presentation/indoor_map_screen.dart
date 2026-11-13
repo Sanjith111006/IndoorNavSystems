@@ -35,11 +35,20 @@ class _IndoorMapScreenState extends ConsumerState<IndoorMapScreen> {
       MapSessionLoading() => const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       ),
-      MapSessionReady(:final building, :final floors, :final floorMap) =>
+      MapSessionReady(
+        :final building,
+        :final floors,
+        :final floorMap,
+        :final destination,
+        :final start,
+      ) =>
         _MapShell(
           buildingName: building.name,
+          buildingId: building.id,
           floors: floors,
           floorMap: floorMap,
+          destinationName: destination?.name,
+          startName: start?.label,
         ),
       MapSessionFailure(:final failure) => Scaffold(
         body: FullStateView(
@@ -59,13 +68,19 @@ class _IndoorMapScreenState extends ConsumerState<IndoorMapScreen> {
 class _MapShell extends ConsumerWidget {
   const _MapShell({
     required this.buildingName,
+    required this.buildingId,
     required this.floors,
     required this.floorMap,
+    required this.destinationName,
+    required this.startName,
   });
 
   final String buildingName;
+  final int buildingId;
   final List<Floor> floors;
   final FloorMap floorMap;
+  final String? destinationName;
+  final String? startName;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -158,13 +173,42 @@ class _MapShell extends ConsumerWidget {
                   color: AppColors.surface,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
                 ),
-                child: const Column(
+                child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text('Explore this floor'),
-                    SizedBox(height: AppSpacing.x2),
-                    Text('Choose a destination to plan a route.'),
+                    Text(
+                      destinationName == null
+                          ? 'Explore this floor'
+                          : 'Destination: $destinationName',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: AppSpacing.x2),
+                    Text(
+                      startName == null
+                          ? 'Choose a destination and start location to plan a route.'
+                          : 'Start: $startName',
+                    ),
+                    const SizedBox(height: AppSpacing.x4),
+                    OutlinedButton.icon(
+                      onPressed: () =>
+                          context.push('/buildings/$buildingId/start'),
+                      icon: const Icon(Icons.my_location_outlined),
+                      label: Text(
+                        startName == null ? 'Choose start' : 'Change start',
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.x2),
+                    FilledButton.icon(
+                      onPressed: () =>
+                          context.push('/buildings/$buildingId/destinations'),
+                      icon: const Icon(Icons.search),
+                      label: Text(
+                        destinationName == null
+                            ? 'Choose a destination'
+                            : 'Change destination',
+                      ),
+                    ),
                   ],
                 ),
               ),

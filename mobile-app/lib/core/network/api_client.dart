@@ -29,9 +29,15 @@ class ApiClient {
 
   final Dio _dio;
 
-  Future<List<Map<String, Object?>>> getObjectList(String path) async {
+  Future<List<Map<String, Object?>>> getObjectList(
+    String path, {
+    Map<String, Object?>? queryParameters,
+  }) async {
     try {
-      final response = await _dio.get<Object?>(path);
+      final response = await _dio.get<Object?>(
+        path,
+        queryParameters: queryParameters,
+      );
       final data = response.data;
       if (data is! List<Object?>) {
         throw const InvalidResponseFailure();
@@ -49,6 +55,27 @@ class ApiClient {
     try {
       final response = await _dio.get<Object?>(path);
       return _asObjectMap(response.data);
+    } on DioException catch (error) {
+      throw _failureFor(error);
+    } on FormatException {
+      throw const InvalidResponseFailure();
+    }
+  }
+
+  Future<List<String>> getStringList(
+    String path, {
+    Map<String, Object?>? queryParameters,
+  }) async {
+    try {
+      final response = await _dio.get<Object?>(
+        path,
+        queryParameters: queryParameters,
+      );
+      final data = response.data;
+      if (data is! List<Object?> || data.any((item) => item is! String)) {
+        throw const InvalidResponseFailure();
+      }
+      return data.cast<String>();
     } on DioException catch (error) {
       throw _failureFor(error);
     } on FormatException {
