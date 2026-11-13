@@ -12,6 +12,8 @@ public interface NodeRepository extends JpaRepository<Node, Long> {
 
     List<Node> findByFloor_IdOrderByIdAsc(Long floorId);
 
+    List<Node> findByBuildingId(Long buildingId);
+
     /** A node is labelled when it has a display name or a linked POI (API.md 6.8). */
     @Query("""
             select new com.indoornav.backend.dto.LabelledNodeResponse(

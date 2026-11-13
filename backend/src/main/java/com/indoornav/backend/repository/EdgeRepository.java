@@ -18,6 +18,8 @@ public interface EdgeRepository extends JpaRepository<Edge, Long> {
             """)
     List<Edge> findTouchingFloor(@Param("floorId") Long floorId);
 
+    List<Edge> findByBuildingId(Long buildingId);
+
     @Query("select e from Edge e join fetch e.fromNode join fetch e.toNode where e.id = :edgeId")
     Optional<Edge> findWithNodesById(@Param("edgeId") Long edgeId);
 }

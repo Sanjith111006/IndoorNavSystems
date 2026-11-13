@@ -61,3 +61,7 @@ app:
     trust-forwarded-headers: ${TRUST_FORWARDED_HEADERS:false}
   floor-plans:
     directory: ${FLOORPLAN_DIR:}
+  routing:
+    avoid-stairs-multiplier: ${ROUTING_AVOID_STAIRS_MULTIPLIER:10}
+    prefer-elevator-multiplier: ${ROUTING_PREFER_ELEVATOR_MULTIPLIER:2}
+    timeout-seconds: ${ROUTING_TIMEOUT_SECONDS:10}
