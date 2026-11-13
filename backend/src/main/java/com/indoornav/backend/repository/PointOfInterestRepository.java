@@ -47,6 +47,9 @@ public interface PointOfInterestRepository extends JpaRepository<PointOfInterest
             """)
     List<String> findCategories(@Param("buildingId") Long buildingId);
 
+    @Query("select p from PointOfInterest p join p.node n where n.buildingId = :buildingId")
+    List<PointOfInterest> findInBuilding(@Param("buildingId") Long buildingId);
+
     @Query("select p from PointOfInterest p where p.node.id in :nodeIds")
     List<PointOfInterest> findByNodeIds(@Param("nodeIds") Collection<Long> nodeIds);
 }

@@ -406,6 +406,9 @@ Computes a route with the Java engine (journeys J1 to J3; screens 7 to 10). The 
 - Start equal to destination returns `FOUND` with a single path node, zero distance, zero duration, and one `ARRIVE` step.
 - The server loads the building graph and active obstacles in one consistent snapshot, runs A*, and never serves a cached result (ARCHITECTURE.md 6.3).
 - Reason codes come from the diagnosis in ARCHITECTURE.md 6.4.
+- `STAIRS_REQUIRED` is added whenever an `AVOID_STAIRS` route still uses stairs.
+- A `DETOUR` warning's `extraDistanceMeters` is null when the detour is not longer than the usual route, which can happen for time-based preferences.
+- Consecutive same-floor connections form one `WALK` step, and consecutive vertical connections of the same type form one `FLOOR_CHANGE` step (for example one elevator ride across two floors). `floorTransitions` still lists every transition.
 - The same request can be repeated safely: it changes no data.
 
 **Errors:** 400 (`VALIDATION_FAILED`, `MALFORMED_REQUEST`, `NODES_NOT_IN_SAME_BUILDING`), 404 (unknown node), 429, 503 (database unavailable or computation timed out; APA-4), 500.
@@ -597,7 +600,7 @@ All server variables are read at startup into typed configuration, and the appli
 | `LOGIN_MAX_FAILED_ATTEMPTS` | No | No | 5 | Login throttle threshold |
 | `LOGIN_ATTEMPT_WINDOW_MINUTES` | No | No | 15 | Login throttle window |
 | `TRUST_FORWARDED_HEADERS` | No | No | false | True only behind a trusted reverse proxy |
-| `ROUTING_*` | No | No | Documented defaults | Surcharge factors and the route time limit (for example `ROUTING_TIMEOUT_SECONDS`, default 10) |
+| `ROUTING_*` | No | No | Documented defaults | Surcharge factors and the route time limit: `ROUTING_AVOID_STAIRS_MULTIPLIER` (default 10), `ROUTING_PREFER_ELEVATOR_MULTIPLIER` (default 2), both at least 1 (ARCHITECTURE.md AA-6); `ROUTING_TIMEOUT_SECONDS` (default 10) |
 
 Prod profile requirements: `DB_PASSWORD`, `JWT_SECRET` and `ADMIN_PASSWORD_HASH` have **no defaults**; startup fails if any is missing, if `JWT_SECRET` is shorter than 32 bytes, or if it equals a known development value.
 
