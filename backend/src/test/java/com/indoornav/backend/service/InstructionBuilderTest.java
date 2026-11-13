@@ -1,5 +1,6 @@
 package com.indoornav.backend.service;
 
+import static com.indoornav.backend.routing.TestSnapshots.CAFE;
 import static com.indoornav.backend.routing.TestSnapshots.ENTRANCE;
 import static com.indoornav.backend.routing.TestSnapshots.GROUND;
 import static com.indoornav.backend.routing.TestSnapshots.LEVEL_ONE;
@@ -10,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.indoornav.backend.dto.RouteResponse.Instruction;
 import com.indoornav.backend.dto.RouteResponse.InstructionType;
+import com.indoornav.backend.dto.RouteResponse.Turn;
 import com.indoornav.backend.routing.RoutingSnapshot;
 import com.indoornav.backend.routing.TestSnapshots;
 import com.indoornav.engine.algorithm.AStarRouteFinder;
@@ -17,6 +19,7 @@ import com.indoornav.engine.model.RoutePreference;
 import com.indoornav.engine.model.RouteRequest;
 import com.indoornav.engine.result.RouteResult;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class InstructionBuilderTest {
@@ -92,10 +95,56 @@ class InstructionBuilderTest {
                 .noneMatch(text -> text.contains("You are here") || text.contains("live"));
     }
 
+    @Test
+    void bendOverTheThresholdStartsAStepWithALeftTurn() {
+        // 1 (0,0) -> 4 (10,10) heads down-right on the plan; 4 -> 3 (20,0) heads up-right: a left turn.
+        List<Instruction> steps = stepsAvoidingCorridor(ENTRANCE, CAFE);
+
+        assertThat(steps).extracting(Instruction::text).containsExactly(
+                "Start at Entrance.", "Walk 15 m.", "Turn left and walk 15 m to Cafe.", "Arrive at Cafe.");
+        assertThat(steps.get(1).turn()).isNull();
+        assertThat(steps.get(2).turn()).isEqualTo(Turn.LEFT);
+        assertThat(steps.get(2).startPathIndex()).isEqualTo(1);
+    }
+
+    @Test
+    void theSameCornerWalkedTheOtherWayIsARightTurn() {
+        List<Instruction> steps = stepsAvoidingCorridor(CAFE, ENTRANCE);
+
+        assertThat(steps.get(2).turn()).isEqualTo(Turn.RIGHT);
+        assertThat(steps.get(2).text()).isEqualTo("Turn right and walk 15 m to Entrance.");
+    }
+
+    @Test
+    void gentleBendBelowTheThresholdStaysOneStep() {
+        // 2 (10,0) -> 3 (20,0) -> 7 (30,5) bends by about 27 degrees.
+        List<Instruction> steps = stepsFor(ENTRANCE, LOUNGE, RoutePreference.FASTEST);
+
+        assertThat(steps).filteredOn(step -> step.type() == InstructionType.WALK)
+                .extracting(Instruction::turn).containsOnlyNulls();
+    }
+
+    @Test
+    void walkAfterAFloorChangeHasNoTurnBecauseItsHeadingIsUnknown() {
+        List<Instruction> steps = stepsFor(ENTRANCE, LOUNGE, RoutePreference.FASTEST);
+
+        assertThat(steps.get(3).type()).isEqualTo(InstructionType.WALK);
+        assertThat(steps.get(3).turn()).isNull();
+    }
+
     private static List<Instruction> stepsFor(long start, long destination, RoutePreference preference) {
+        return stepsFor(RouteRequest.of(start, destination, preference));
+    }
+
+    /** Blocks the direct corridor 2-3, so the route bends through node 4. */
+    private static List<Instruction> stepsAvoidingCorridor(long start, long destination) {
+        return stepsFor(new RouteRequest(
+                start, destination, RoutePreference.SHORTEST, Set.of(), Set.of(TestSnapshots.CORRIDOR_2_TO_3)));
+    }
+
+    private static List<Instruction> stepsFor(RouteRequest request) {
         RoutingSnapshot snapshot = TestSnapshots.open();
-        RouteResult route = new AStarRouteFinder()
-                .findRoute(snapshot.graph(), RouteRequest.of(start, destination, preference), snapshot.costs());
+        RouteResult route = new AStarRouteFinder().findRoute(snapshot.graph(), request, snapshot.costs());
         return new InstructionBuilder().build(snapshot, route);
     }
 }

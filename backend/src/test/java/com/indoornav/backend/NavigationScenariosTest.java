@@ -41,6 +41,7 @@ class NavigationScenariosTest {
     private static final long WEST_ENTRANCE = 1001L;
     private static final long GROUND_STAIRS = 1005L;
     private static final long CENTRAL_MARKET = 1006L;
+    private static final long NORTH_RESTROOMS = 1012L;
     private static final long QUIET_CORNER = 1020L;
     private static final long BOOKS_AND_MEDIA = 1102L;
     private static final long CINEMA_LOBBY = 1202L;
@@ -181,6 +182,21 @@ class NavigationScenariosTest {
         assertThat(texts).contains("Take the elevator to Level 2.");
         assertThat(texts.getLast()).isEqualTo("Arrive at Cinema lobby.");
         assertThat(route.get("floorTransitions")).hasSize(2);
+    }
+
+    @Test
+    void turnWordingFollowsTheFloorPlanGeometry() throws Exception {
+        // East along the ground corridor to 1004 (400,350), then up the plan to 1012 (500,150).
+        JsonNode route = route(WEST_ENTRANCE, NORTH_RESTROOMS, "SHORTEST");
+
+        List<String> texts = new ArrayList<>();
+        route.get("instructions").forEach(step -> texts.add(step.get("text").asString()));
+        assertThat(texts).containsExactly(
+                "Start at West entrance.",
+                "Walk 30 m.",
+                "Turn left and walk 23 m to North restrooms.",
+                "Arrive at North restrooms.");
+        assertThat(route.get("instructions").get(2).get("turn").asString()).isEqualTo("LEFT");
     }
 
     @Test
