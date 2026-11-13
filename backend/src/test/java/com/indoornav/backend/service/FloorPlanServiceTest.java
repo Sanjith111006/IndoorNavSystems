@@ -10,6 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -61,6 +63,7 @@ class FloorPlanServiceTest {
     }
 
     @Test
+    @EnabledOnOs({OS.LINUX, OS.MAC})
     void symbolicLinkLeadingOutsideTheDirectoryIsNotFound() throws IOException {
         Files.createSymbolicLink(plans.resolve("escape.svg"), root.resolve("secret.svg"));
 
