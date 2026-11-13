@@ -191,8 +191,10 @@ class RouteFinderTest {
             RouteResult aStarResult = aStar.findRoute(graph, request, costs());
             RouteResult dijkstraResult = dijkstra.findRoute(graph, request, costs());
             assertEquals(dijkstraResult.status(), aStarResult.status());
-            assertEquals(dijkstraResult.totalDistanceMetres(), aStarResult.totalDistanceMetres(), TOLERANCE);
-            assertEquals(dijkstraResult.totalEstimatedTimeSeconds(), aStarResult.totalEstimatedTimeSeconds(), TOLERANCE);
+            assertEquals(
+                    routeCost(graph, dijkstraResult, preference),
+                    routeCost(graph, aStarResult, preference),
+                    TOLERANCE);
         }
     }
 
@@ -213,8 +215,10 @@ class RouteFinderTest {
                 RouteResult dijkstraResult = dijkstra.findRoute(graph, request, costs());
 
                 assertEquals(dijkstraResult.status(), aStarResult.status());
-                assertEquals(dijkstraResult.totalDistanceMetres(), aStarResult.totalDistanceMetres(), TOLERANCE);
-                assertEquals(dijkstraResult.totalEstimatedTimeSeconds(), aStarResult.totalEstimatedTimeSeconds(), TOLERANCE);
+                assertEquals(
+                        routeCost(graph, dijkstraResult, preference),
+                        routeCost(graph, aStarResult, preference),
+                        TOLERANCE);
             }
         }
     }
@@ -295,5 +299,29 @@ class RouteFinderTest {
                 ConnectionType.ELEVATOR
         };
         return types[random.nextInt(types.length)];
+    }
+
+    private double routeCost(NavigationGraph graph, RouteResult route, RoutePreference preference) {
+        RoutingCostConfiguration configuration = costs();
+        return route.edgeIds().stream()
+                .map(graph::edge)
+                .mapToDouble(edge -> traversalCost(edge, preference, configuration))
+                .sum();
+    }
+
+    private double traversalCost(
+            NavigationEdge edge, RoutePreference preference, RoutingCostConfiguration configuration) {
+        if (preference == RoutePreference.SHORTEST) {
+            return edge.distanceMetres();
+        }
+        double time = configuration.travelTimeSeconds(edge);
+        if (!edge.connectionType().isStairs()) {
+            return time;
+        }
+        return switch (preference) {
+            case AVOID_STAIRS -> time * configuration.avoidStairsMultiplier();
+            case PREFER_ELEVATOR -> time * configuration.preferElevatorStairsMultiplier();
+            default -> time;
+        };
     }
 }
