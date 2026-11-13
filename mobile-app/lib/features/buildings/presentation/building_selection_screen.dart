@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/errors/app_failure.dart';
 import '../../../core/theme/app_theme.dart';
@@ -67,7 +68,7 @@ class _BuildingList extends StatelessWidget {
             title: Text(building.name),
             subtitle: Text(details.join(' · ')),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () {},
+            onTap: () => context.go('/buildings/${building.id}/map'),
           ),
         );
       },

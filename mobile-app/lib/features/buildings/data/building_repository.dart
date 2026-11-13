@@ -24,4 +24,15 @@ class BuildingRepository {
       return const Failure(InvalidResponseFailure());
     }
   }
+
+  Future<Result<BuildingDetail>> fetchBuilding(int buildingId) async {
+    try {
+      final data = await _apiClient.getObject('/api/buildings/$buildingId');
+      return Success(BuildingDetail.fromJson(data));
+    } on AppFailure catch (failure) {
+      return Failure(failure);
+    } on FormatException {
+      return const Failure(InvalidResponseFailure());
+    }
+  }
 }
