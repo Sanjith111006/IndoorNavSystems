@@ -60,6 +60,8 @@ class RouteControllerTest {
                 .andExpect(jsonPath("$.estimatedDurationSeconds").value(11))
                 .andExpect(jsonPath("$.instructions[0].type").value("WALK"))
                 .andExpect(jsonPath("$.instructions[0].toFloorId").doesNotExist())
+                .andExpect(jsonPath("$.instructions[0].turn").doesNotExist())
+                .andExpect(jsonPath("$.instructions[1].turn").value("LEFT"))
                 .andExpect(jsonPath("$.warnings[0].code").value("DETOUR"))
                 .andExpect(jsonPath("$.warnings[0].extraDistanceMeters").value(nullValue()))
                 .andExpect(jsonPath("$.noRoute").doesNotExist());
@@ -157,8 +159,12 @@ class RouteControllerTest {
         List<RouteResponse.PathNode> path = List.of(
                 new RouteResponse.PathNode(1L, 10L, BigDecimal.ZERO, BigDecimal.ZERO, NodeType.BUILDING_ENTRANCE, "Entrance"),
                 new RouteResponse.PathNode(2L, 10L, BigDecimal.TEN, BigDecimal.ZERO, NodeType.ROOM_ENTRANCE, null));
-        List<RouteResponse.Instruction> steps = List.of(new RouteResponse.Instruction(
-                RouteResponse.InstructionType.WALK, "Walk 13 m.", 12.5, 10L, null, null, 0, 1));
+        List<RouteResponse.Instruction> steps = List.of(
+                new RouteResponse.Instruction(
+                        RouteResponse.InstructionType.WALK, "Walk 13 m.", 12.5, 10L, null, null, null, 0, 1),
+                new RouteResponse.Instruction(
+                        RouteResponse.InstructionType.WALK, "Turn left and walk 5 m.", 5.0, 10L, null, null,
+                        RouteResponse.Turn.LEFT, 1, 1));
         List<RouteResponse.Warning> warnings = List.of(new RouteResponse.Warning(
                 RouteResponse.WarningCode.DETOUR, "Part of the usual route is closed. This route avoids it.", List.of(5L), null));
         return RouteResponse.found(RoutePreference.FASTEST, path, 12.5, 11, List.of(), steps, warnings);

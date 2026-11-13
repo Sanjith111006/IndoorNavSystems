@@ -408,7 +408,8 @@ Computes a route with the Java engine (journeys J1 to J3; screens 7 to 10). The 
 - Reason codes come from the diagnosis in ARCHITECTURE.md 6.4.
 - `STAIRS_REQUIRED` is added whenever an `AVOID_STAIRS` route still uses stairs.
 - A `DETOUR` warning's `extraDistanceMeters` is null when the detour is not longer than the usual route, which can happen for time-based preferences.
-- Consecutive same-floor connections form one `WALK` step, and consecutive vertical connections of the same type form one `FLOOR_CHANGE` step (for example one elevator ride across two floors). `floorTransitions` still lists every transition.
+- Consecutive same-floor connections form one `WALK` step until the path bends by 30 degrees or more; the next `WALK` step then carries `turn` (`LEFT` or `RIGHT`) and text such as "Turn left and walk 15 m to …". A walk that follows `START` or a `FLOOR_CHANGE` has no `turn`, because the visitor's heading is unknown there. Straight continuations are merged, so `STRAIGHT` is not sent.
+- Consecutive vertical connections of the same type form one `FLOOR_CHANGE` step (for example one elevator ride across two floors). `floorTransitions` still lists every transition.
 - The same request can be repeated safely: it changes no data.
 
 **Errors:** 400 (`VALIDATION_FAILED`, `MALFORMED_REQUEST`, `NODES_NOT_IN_SAME_BUILDING`), 404 (unknown node), 429, 503 (database unavailable or computation timed out; APA-4), 500.

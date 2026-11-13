@@ -31,6 +31,15 @@ public record RouteResponse(
         ARRIVE
     }
 
+    /**
+     * The turn that starts a walk step. API.md also allows STRAIGHT, but straight continuations
+     * are merged into the previous walk step, so this backend never sends it.
+     */
+    public enum Turn {
+        LEFT,
+        RIGHT
+    }
+
     public enum WarningCode {
         DETOUR,
         STAIRS_REQUIRED
@@ -58,6 +67,7 @@ public record RouteResponse(
             Long floorId,
             Long toFloorId,
             String connectionType,
+            Turn turn,
             int startPathIndex,
             int endPathIndex) {
     }
