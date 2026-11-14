@@ -613,7 +613,11 @@ The API base URL is supplied at build or run time (compile-time define), with no
 - Branch protection on main: required checks, required review, no direct pushes.
 
 The implemented backend workflow is `.github/workflows/backend.yml`. Its path filters include
-the backend, engine, database assets, Maven parent and documents that govern those contracts.
+the backend, engine, database assets, container and Compose inputs, Maven parent and documents
+that govern those contracts. It runs the Java suite, builds the backend image, and validates the
+Compose configuration with a CI-only placeholder database password. It then starts the full
+Compose stack, checks its database-backed health endpoint, preserves logs on a failed smoke test,
+and removes the test containers and volume.
 `.github/dependabot.yml` schedules weekly checks for Maven, Flutter, GitHub Actions and container
 dependencies. The pull-request template records requirement, verification, contract and safety
 checks before review. `docs/testing/demo-and-recovery-checklist.md` records the local Compose

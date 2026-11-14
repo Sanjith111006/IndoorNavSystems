@@ -30,8 +30,9 @@ mvn test
 the repeatable demo seeds, then validates the schema and data constraints. Docker must be
 running for that test; the remaining unit and web tests do not require a database.
 
-GitHub Actions runs the same backend and engine test suite for changes to their source,
-database assets or governing contracts.
+GitHub Actions runs the same backend and engine test suite, builds the backend container image,
+validates the Compose configuration, and starts the complete stack through its database-backed
+health endpoint for changes to the application, database, container, or governing-contract files.
 
 To start the backend you need PostgreSQL and the migrations in `database/migrations`. Copy `.env.example` to `.env`, fill in the values and export them into your shell, then run:
 
