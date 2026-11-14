@@ -6,6 +6,10 @@ on:
       - "algorithm-engine/**"
       - "backend/**"
       - "database/**"
+      - "docker-compose.yml"
+      - ".dockerignore"
+      - ".env.example"
+      - ".github/dependabot.yml"
       - "pom.xml"
       - ".github/workflows/backend.yml"
       - "docs/AGENTS.md"
@@ -18,6 +22,10 @@ on:
       - "algorithm-engine/**"
       - "backend/**"
       - "database/**"
+      - "docker-compose.yml"
+      - ".dockerignore"
+      - ".env.example"
+      - ".github/dependabot.yml"
       - "pom.xml"
       - ".github/workflows/backend.yml"
       - "docs/AGENTS.md"
@@ -42,3 +50,33 @@ jobs:
           cache: maven
       - name: Run backend and engine tests
         run: mvn --batch-mode --no-transfer-progress test
+      - name: Build backend container image
+        run: docker build --file backend/Dockerfile --tag indoor-navigation-backend:ci .
+      - name: Validate Compose configuration
+        env:
+          POSTGRES_PASSWORD: ci-placeholder-not-a-secret
+        run: docker compose config --quiet
+      - name: Start Compose smoke-test stack
+        env:
+          POSTGRES_PASSWORD: ci-placeholder-not-a-secret
+        run: docker compose up --build --detach --wait
+      - name: Verify database-backed health endpoint
+        shell: bash
+        run: |
+          for attempt in {1..30}; do
+            if curl --fail --silent --show-error http://localhost:8080/api/health; then
+              exit 0
+            fi
+            sleep 2
+          done
+          exit 1
+      - name: Show Compose logs after a failure
+        if: failure()
+        env:
+          POSTGRES_PASSWORD: ci-placeholder-not-a-secret
+        run: docker compose logs --no-color
+      - name: Stop Compose smoke-test stack
+        if: always()
+        env:
+          POSTGRES_PASSWORD: ci-placeholder-not-a-secret
+        run: docker compose down --volumes --remove-orphans
