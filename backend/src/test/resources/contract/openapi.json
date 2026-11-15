@@ -1,0 +1,1192 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Indoor Navigation API",
+    "version" : "0.1.0"
+  },
+  "paths" : {
+    "/api/auth/login" : {
+      "post" : {
+        "operationId" : "login",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LoginResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "auth-controller" ]
+      }
+    },
+    "/api/buildings" : {
+      "get" : {
+        "operationId" : "listBuildings",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/BuildingSummaryResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "building-controller" ]
+      }
+    },
+    "/api/buildings/{buildingId}" : {
+      "get" : {
+        "operationId" : "getBuilding",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "buildingId",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "exclusiveMinimum" : 0
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/BuildingDetailResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "building-controller" ]
+      }
+    },
+    "/api/buildings/{buildingId}/floors" : {
+      "get" : {
+        "operationId" : "listFloors",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "buildingId",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "exclusiveMinimum" : 0
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/FloorResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "building-controller" ]
+      }
+    },
+    "/api/buildings/{buildingId}/nodes" : {
+      "get" : {
+        "operationId" : "listNodes",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "buildingId",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "exclusiveMinimum" : 0
+          }
+        }, {
+          "in" : "query",
+          "name" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "limit",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 50,
+            "maximum" : 100,
+            "minimum" : 1
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/LabelledNodeResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "building-controller" ]
+      }
+    },
+    "/api/floors/{floorId}/map" : {
+      "get" : {
+        "operationId" : "getFloorMap",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "floorId",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "exclusiveMinimum" : 0
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/FloorMapResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "floor-controller" ]
+      }
+    },
+    "/api/health" : {
+      "get" : {
+        "operationId" : "health",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/HealthResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "health-controller" ]
+      }
+    },
+    "/api/navigation/route" : {
+      "post" : {
+        "operationId" : "route",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/RouteRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/RouteResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "route-controller" ]
+      }
+    },
+    "/api/obstacles" : {
+      "get" : {
+        "operationId" : "list",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "buildingId",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "exclusiveMinimum" : 0
+          }
+        }, {
+          "in" : "query",
+          "name" : "status",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "ACTIVE", "RESOLVED" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ObstacleResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "tags" : [ "obstacle-controller" ]
+      },
+      "post" : {
+        "operationId" : "create",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ObstacleCreateRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ObstacleResponse"
+                }
+              }
+            },
+            "description" : "Created"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "tags" : [ "obstacle-controller" ]
+      }
+    },
+    "/api/obstacles/{obstacleId}" : {
+      "delete" : {
+        "operationId" : "delete",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "obstacleId",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "exclusiveMinimum" : 0
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Deleted"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "tags" : [ "obstacle-controller" ]
+      },
+      "put" : {
+        "operationId" : "update",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "obstacleId",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "exclusiveMinimum" : 0
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ObstacleUpdateRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ObstacleResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "tags" : [ "obstacle-controller" ]
+      }
+    },
+    "/api/points-of-interest" : {
+      "get" : {
+        "operationId" : "search",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "buildingId",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "exclusiveMinimum" : 0
+          }
+        }, {
+          "in" : "query",
+          "name" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "category",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maxLength" : 50,
+            "minLength" : 0,
+            "pattern" : "[a-z][a-z0-9-]*"
+          }
+        }, {
+          "in" : "query",
+          "name" : "limit",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 30,
+            "maximum" : 50,
+            "minimum" : 1
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/PointOfInterestResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "point-of-interest-controller" ]
+      }
+    },
+    "/api/points-of-interest/categories" : {
+      "get" : {
+        "operationId" : "listCategories",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "buildingId",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "exclusiveMinimum" : 0
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "string"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "point-of-interest-controller" ]
+      }
+    },
+    "/assets/floorplans/{path}" : {
+      "get" : {
+        "operationId" : "getFloorPlan",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "header",
+          "name" : "If-None-Match",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "image/svg+xml" : {
+                "schema" : {
+                  "type" : "string",
+                  "format" : "byte"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "floor-plan-controller" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "Bounds" : {
+        "type" : "object",
+        "properties" : {
+          "height" : {
+            "type" : "number"
+          },
+          "width" : {
+            "type" : "number"
+          },
+          "x" : {
+            "type" : "number"
+          },
+          "y" : {
+            "type" : "number"
+          }
+        }
+      },
+      "BuildingDetailResponse" : {
+        "type" : "object",
+        "properties" : {
+          "address" : {
+            "type" : "string"
+          },
+          "buildingType" : {
+            "type" : "string"
+          },
+          "defaultFloorId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "floorCount" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string"
+          }
+        }
+      },
+      "BuildingSummaryResponse" : {
+        "type" : "object",
+        "properties" : {
+          "address" : {
+            "type" : "string"
+          },
+          "buildingType" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "floorCount" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string"
+          }
+        }
+      },
+      "FloorMapResponse" : {
+        "type" : "object",
+        "properties" : {
+          "edges" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/MapEdge"
+            }
+          },
+          "floor" : {
+            "$ref" : "#/components/schemas/FloorResponse"
+          },
+          "nodes" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/MapNode"
+            }
+          },
+          "plan" : {
+            "$ref" : "#/components/schemas/Plan"
+          },
+          "pointsOfInterest" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/MapPointOfInterest"
+            }
+          },
+          "rooms" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/MapRoom"
+            }
+          }
+        }
+      },
+      "FloorResponse" : {
+        "type" : "object",
+        "properties" : {
+          "buildingId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "displayName" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "level" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }
+      },
+      "FloorTransition" : {
+        "type" : "object",
+        "properties" : {
+          "connectionType" : {
+            "type" : "string"
+          },
+          "fromFloorId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "pathIndex" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "toFloorId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
+      "HealthResponse" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "string"
+          },
+          "database" : {
+            "type" : "string"
+          },
+          "message" : {
+            "type" : "string"
+          },
+          "path" : {
+            "type" : "string"
+          },
+          "requestId" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "string"
+          },
+          "timestamp" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }
+      },
+      "Instruction" : {
+        "type" : "object",
+        "properties" : {
+          "connectionType" : {
+            "type" : "string"
+          },
+          "distanceMeters" : {
+            "type" : "number",
+            "format" : "double"
+          },
+          "endPathIndex" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "floorId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "startPathIndex" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "text" : {
+            "type" : "string"
+          },
+          "toFloorId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "turn" : {
+            "type" : "string",
+            "enum" : [ "LEFT", "RIGHT" ]
+          },
+          "type" : {
+            "type" : "string",
+            "enum" : [ "START", "WALK", "FLOOR_CHANGE", "ARRIVE" ]
+          }
+        }
+      },
+      "LabelledNodeResponse" : {
+        "type" : "object",
+        "properties" : {
+          "floorDisplayName" : {
+            "type" : "string"
+          },
+          "floorId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "label" : {
+            "type" : "string"
+          },
+          "type" : {
+            "type" : "string",
+            "enum" : [ "CORRIDOR_JUNCTION", "ROOM_ENTRANCE", "STAIR_LANDING", "ELEVATOR_ENTRANCE", "BUILDING_ENTRANCE", "FLOOR_TRANSITION", "POINT_OF_INTEREST" ]
+          },
+          "x" : {
+            "type" : "number"
+          },
+          "y" : {
+            "type" : "number"
+          }
+        }
+      },
+      "LoginRequest" : {
+        "type" : "object",
+        "properties" : {
+          "password" : {
+            "type" : "string",
+            "maxLength" : 200,
+            "minLength" : 0
+          },
+          "username" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "password", "username" ]
+      },
+      "LoginResponse" : {
+        "type" : "object",
+        "properties" : {
+          "accessToken" : {
+            "type" : "string"
+          },
+          "expiresInSeconds" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "tokenType" : {
+            "type" : "string"
+          }
+        }
+      },
+      "MapEdge" : {
+        "type" : "object",
+        "properties" : {
+          "accessible" : {
+            "type" : "boolean"
+          },
+          "bidirectional" : {
+            "type" : "boolean"
+          },
+          "blocked" : {
+            "type" : "boolean"
+          },
+          "connectionType" : {
+            "type" : "string"
+          },
+          "fromNodeId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "obstacle" : {
+            "$ref" : "#/components/schemas/ObstacleSummary"
+          },
+          "otherFloorId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "toNodeId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
+      "MapNode" : {
+        "type" : "object",
+        "properties" : {
+          "accessible" : {
+            "type" : "boolean"
+          },
+          "blocked" : {
+            "type" : "boolean"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "obstacle" : {
+            "$ref" : "#/components/schemas/ObstacleSummary"
+          },
+          "type" : {
+            "type" : "string",
+            "enum" : [ "CORRIDOR_JUNCTION", "ROOM_ENTRANCE", "STAIR_LANDING", "ELEVATOR_ENTRANCE", "BUILDING_ENTRANCE", "FLOOR_TRANSITION", "POINT_OF_INTEREST" ]
+          },
+          "x" : {
+            "type" : "number"
+          },
+          "y" : {
+            "type" : "number"
+          }
+        }
+      },
+      "MapPointOfInterest" : {
+        "type" : "object",
+        "properties" : {
+          "category" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "nodeId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "roomId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
+      "MapRoom" : {
+        "type" : "object",
+        "properties" : {
+          "bounds" : {
+            "$ref" : "#/components/schemas/Bounds"
+          },
+          "category" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string"
+          }
+        }
+      },
+      "NoRoute" : {
+        "type" : "object",
+        "properties" : {
+          "message" : {
+            "type" : "string"
+          },
+          "obstacles" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ObstacleSummary"
+            }
+          },
+          "reasonCode" : {
+            "type" : "string",
+            "enum" : [ "OBSTACLE", "ACCESSIBILITY_CONSTRAINT", "DISCONNECTED" ]
+          }
+        }
+      },
+      "ObstacleCreateRequest" : {
+        "type" : "object",
+        "properties" : {
+          "description" : {
+            "type" : "string",
+            "maxLength" : 200,
+            "minLength" : 3
+          },
+          "obstacleType" : {
+            "type" : "string",
+            "enum" : [ "BLOCKED_CORRIDOR", "CLOSED_ROOM", "BROKEN_ELEVATOR", "CLOSED_STAIRCASE", "CONSTRUCTION_AREA", "RESTRICTED_CONNECTION" ]
+          },
+          "targetId" : {
+            "type" : "integer",
+            "format" : "int64",
+            "exclusiveMinimum" : 0
+          },
+          "targetType" : {
+            "type" : "string",
+            "enum" : [ "EDGE", "NODE" ]
+          }
+        },
+        "required" : [ "description", "obstacleType", "targetId", "targetType" ]
+      },
+      "ObstacleResponse" : {
+        "type" : "object",
+        "properties" : {
+          "buildingId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "edgeId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "floorIds" : {
+            "type" : "array",
+            "items" : {
+              "type" : "integer",
+              "format" : "int64"
+            }
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "nodeId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "obstacleType" : {
+            "type" : "string",
+            "enum" : [ "BLOCKED_CORRIDOR", "CLOSED_ROOM", "BROKEN_ELEVATOR", "CLOSED_STAIRCASE", "CONSTRUCTION_AREA", "RESTRICTED_CONNECTION" ]
+          },
+          "status" : {
+            "type" : "string",
+            "enum" : [ "ACTIVE", "RESOLVED" ]
+          },
+          "targetSummary" : {
+            "type" : "string"
+          },
+          "targetType" : {
+            "type" : "string",
+            "enum" : [ "EDGE", "NODE" ]
+          },
+          "updatedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "version" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
+      "ObstacleSummary" : {
+        "type" : "object",
+        "properties" : {
+          "description" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "type" : {
+            "type" : "string",
+            "enum" : [ "BLOCKED_CORRIDOR", "CLOSED_ROOM", "BROKEN_ELEVATOR", "CLOSED_STAIRCASE", "CONSTRUCTION_AREA", "RESTRICTED_CONNECTION" ]
+          }
+        }
+      },
+      "ObstacleUpdateRequest" : {
+        "type" : "object",
+        "properties" : {
+          "description" : {
+            "type" : "string",
+            "maxLength" : 200,
+            "minLength" : 3
+          },
+          "obstacleType" : {
+            "type" : "string",
+            "enum" : [ "BLOCKED_CORRIDOR", "CLOSED_ROOM", "BROKEN_ELEVATOR", "CLOSED_STAIRCASE", "CONSTRUCTION_AREA", "RESTRICTED_CONNECTION" ]
+          },
+          "status" : {
+            "type" : "string",
+            "enum" : [ "ACTIVE", "RESOLVED" ]
+          },
+          "version" : {
+            "type" : "integer",
+            "format" : "int64",
+            "minimum" : 0
+          }
+        },
+        "required" : [ "description", "obstacleType", "status", "version" ]
+      },
+      "PathNode" : {
+        "type" : "object",
+        "properties" : {
+          "floorId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "nodeId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "type" : {
+            "type" : "string",
+            "enum" : [ "CORRIDOR_JUNCTION", "ROOM_ENTRANCE", "STAIR_LANDING", "ELEVATOR_ENTRANCE", "BUILDING_ENTRANCE", "FLOOR_TRANSITION", "POINT_OF_INTEREST" ]
+          },
+          "x" : {
+            "type" : "number"
+          },
+          "y" : {
+            "type" : "number"
+          }
+        }
+      },
+      "Plan" : {
+        "type" : "object",
+        "properties" : {
+          "height" : {
+            "type" : "number"
+          },
+          "metresPerUnit" : {
+            "type" : "number"
+          },
+          "url" : {
+            "type" : "string"
+          },
+          "width" : {
+            "type" : "number"
+          }
+        }
+      },
+      "PointOfInterestResponse" : {
+        "type" : "object",
+        "properties" : {
+          "category" : {
+            "type" : "string"
+          },
+          "floorDisplayName" : {
+            "type" : "string"
+          },
+          "floorId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "nodeId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
+      "RouteRequest" : {
+        "type" : "object",
+        "properties" : {
+          "destinationNodeId" : {
+            "type" : "integer",
+            "format" : "int64",
+            "exclusiveMinimum" : 0
+          },
+          "preference" : {
+            "type" : "string",
+            "enum" : [ "SHORTEST", "FASTEST", "ACCESSIBLE", "AVOID_STAIRS", "PREFER_ELEVATOR" ]
+          },
+          "startNodeId" : {
+            "type" : "integer",
+            "format" : "int64",
+            "exclusiveMinimum" : 0
+          }
+        },
+        "required" : [ "destinationNodeId", "startNodeId" ]
+      },
+      "RouteResponse" : {
+        "type" : "object",
+        "properties" : {
+          "distanceMeters" : {
+            "type" : "number",
+            "format" : "double"
+          },
+          "estimatedDurationSeconds" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "floorTransitions" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/FloorTransition"
+            }
+          },
+          "instructions" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Instruction"
+            }
+          },
+          "noRoute" : {
+            "$ref" : "#/components/schemas/NoRoute"
+          },
+          "pathNodes" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/PathNode"
+            }
+          },
+          "preference" : {
+            "type" : "string",
+            "enum" : [ "SHORTEST", "FASTEST", "ACCESSIBLE", "AVOID_STAIRS", "PREFER_ELEVATOR" ]
+          },
+          "status" : {
+            "type" : "string",
+            "enum" : [ "FOUND", "NO_ROUTE" ]
+          },
+          "warnings" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Warning"
+            }
+          }
+        }
+      },
+      "Warning" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "string",
+            "enum" : [ "DETOUR", "STAIRS_REQUIRED" ]
+          },
+          "extraDistanceMeters" : {
+            "type" : "number",
+            "format" : "double"
+          },
+          "message" : {
+            "type" : "string"
+          },
+          "obstacleIds" : {
+            "type" : "array",
+            "items" : {
+              "type" : "integer",
+              "format" : "int64"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "bearerAuth" : {
+        "bearerFormat" : "JWT",
+        "scheme" : "bearer",
+        "type" : "http"
+      }
+    }
+  }
+}
