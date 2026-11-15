@@ -6,6 +6,7 @@ import com.indoornav.backend.dto.ObstacleResponse;
 import com.indoornav.backend.dto.ObstacleUpdateRequest;
 import com.indoornav.backend.entity.ObstacleStatus;
 import com.indoornav.backend.service.ObstacleService;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -40,7 +41,9 @@ public class ObstacleController {
         return obstacleService.list(buildingId, status);
     }
 
+    /** The status is set inside the ResponseEntity, so it is declared here for the OpenAPI document. */
     @PostMapping
+    @ApiResponse(responseCode = "201", description = "Created", useReturnTypeSchema = true)
     public ResponseEntity<ObstacleResponse> create(@Valid @RequestBody ObstacleCreateRequest request) {
         ObstacleResponse created = obstacleService.create(request);
         return ResponseEntity.created(URI.create("/api/obstacles/" + created.id())).body(created);
@@ -53,6 +56,7 @@ public class ObstacleController {
     }
 
     @DeleteMapping("/{obstacleId}")
+    @ApiResponse(responseCode = "204", description = "Deleted")
     public ResponseEntity<Void> delete(@PathVariable @Positive long obstacleId) {
         obstacleService.delete(obstacleId);
         return ResponseEntity.noContent().build();

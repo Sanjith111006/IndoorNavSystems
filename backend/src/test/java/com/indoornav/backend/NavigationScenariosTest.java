@@ -52,10 +52,7 @@ class NavigationScenariosTest {
     private static final long LEVEL_ONE_FLOOR = 101L;
 
     @Container
-    static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer("postgres:17-alpine")
-            .withDatabaseName("indoornav")
-            .withUsername("test")
-            .withPassword("test-password");
+    static final PostgreSQLContainer POSTGRES = TestDatabase.newContainer();
 
     private final JsonMapper json = JsonMapper.builder().build();
 
@@ -70,11 +67,7 @@ class NavigationScenariosTest {
 
     @DynamicPropertySource
     static void databaseProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
-        registry.add("spring.datasource.username", POSTGRES::getUsername);
-        registry.add("spring.datasource.password", POSTGRES::getPassword);
-        registry.add("spring.flyway.user", POSTGRES::getUsername);
-        registry.add("spring.flyway.password", POSTGRES::getPassword);
+        TestDatabase.register(registry, POSTGRES);
     }
 
     /** Keeps the tests independent: the seed itself has no obstacles. */
